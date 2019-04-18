@@ -134,7 +134,7 @@ classdef class_randomforest_GA
         function new_population = mutation(obj, population, mutation_ratio)
            
             if nargin < 3
-                mutation_ratio = 1 / obj.population_size;
+                mutation_ratio = 1 / obj.t_num;
             end            
 
             new_population = population;
