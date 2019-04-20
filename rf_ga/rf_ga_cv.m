@@ -15,7 +15,7 @@ for i = 1 : length(datalist)
     cv_div = 10;
     acc_list = zeros(cv_num * cv_div, 3);
     
-    method = 'oob';
+    method = 'validation';
     
     for cv_count = 1 : cv_num
         rng(cv_count)
