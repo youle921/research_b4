@@ -11,7 +11,7 @@ for i = 1 : length(datalist)
     answer = table2array(T(:, size(T, 2)));
     class = unique(answer);
 
-    cv_num = 1;
+    cv_num = 2;
     cv_div = 10;
     acc_list = zeros(cv_num * cv_div, 3);
     
@@ -40,7 +40,7 @@ for i = 1 : length(datalist)
     end
     
     csvwrite(['result\' method '_' dataname '.csv'], acc_list);
-    disp([dataname 'finished'])
+    disp([dataname ' finished'])
 end
 
 disp(['----' method ' method result----'])
