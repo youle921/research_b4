@@ -3,7 +3,7 @@ function acc = rf_ga_framework(seed, train_data, train_ans, test_data, test_ans,
     tree_num = 50;
     p_num = 50;
     c_num = 50;
-    gen = 1000;
+    gen = 10;
     
     valid_data = [];
     valid_ans = [];

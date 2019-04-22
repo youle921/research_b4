@@ -97,7 +97,14 @@ classdef class_randomforest_GA
         function obj = generate_next_generation(obj)
             
             children = obj.get_children();
+            
             acc = obj.evaluate_method(children);
+            for i = 1 : obj.children_size
+               if sum(ismember(obj.population_list, children(i, :)))
+                   acc(i) = 0;
+               end
+            end
+            
             tmp_value = vertcat(obj.parent_value, acc);
             tmp_pop = vertcat(obj.population_list, children);
             [~, id] = sort(tmp_value, 'descend');
@@ -125,7 +132,12 @@ classdef class_randomforest_GA
         function parent = get_parent(obj)
             
             parent_id = randi(obj.population_size, obj.children_size, 2);
+            
             [~, winner] = max(obj.parent_value(parent_id), [], 2);
+            [~, tmp] = max(fliplr(obj.parent_value(parent_id)), [], 2);
+            cnt = sum(winner == tmp);
+            winner(winner == tmp) = randi(2, cnt, 1);
+            
             chosen_parent = diag(parent_id(:, winner)); %”z—ñ‘€ì‚ª‚í‚©‚ç‚È‚¢‚Ì‚Å‚â‚Á‚Â‚¯
             parent = obj.population_list(chosen_parent, :);      
             

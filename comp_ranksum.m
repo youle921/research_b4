@@ -1,29 +1,30 @@
-comp1_filename = 'result_add_pima.csv';
-comp2_filename = 'result_add_pima.csv';
+filepath = 'rf_ga\result\';
+list = dir([filepath  'validation*.csv']);
 
-comp1 = csvread(comp1_filename);
-comp2 = csvread(comp2_filename);
+for i = 1 : length(list)
 
-for i = 1:5
-    [p, h] = ranksum(comp1((i - 1) * 200 + 1 : i * 200, 1), comp2((i - 1) * 200 + 1 : i * 200, 2));
+    disp(list(i).name)
+    filename = [filepath list(i).name];
+    comp = csvread(filename);
+
+    [p, h] = ranksum(comp(:, 1), comp(:, 3));
 
     if h
-        disp("有意水準5％で中央値が等しいという仮説が棄却")
+        disp("有意水準5％で中央値が等しくない")
     else
-        disp("有意水準5％で棄却できない")
+        disp("有意水準5％で中央値が等しいという仮説が棄却できない")
     end
 
     disp(p)
-end
 
-for i = 1:5
-    [p, h] = ranksum(comp1((i - 1) * 200 + 1 : i * 200, 1), comp2((i - 1) * 200 + 1 : i * 200, 3));
+    [p, h] = ranksum(comp(:, 2), comp(:, 3));
 
     if h
-        disp("有意水準5％で中央値が等しいという仮説が棄却")
+        disp("有意水準5％で中央値が等しくない")
     else
-        disp("有意水準5％で棄却できない")
+        disp("有意水準5％で中央値が等しいという仮説が棄却できない")
     end
 
     disp(p)
+    disp('------------------------------------------------')
 end
