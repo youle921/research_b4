@@ -100,7 +100,7 @@ classdef class_randomforest_GA
             
             acc = obj.evaluate_method(children);
             for i = 1 : obj.children_size
-               if sum(ismember(obj.population_list, children(i, :)))
+               if sum(ismember(obj.population_list, children(i, :), 'rows')) > 0
                    acc(i) = 0;
                end
             end
