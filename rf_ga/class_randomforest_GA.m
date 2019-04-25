@@ -99,11 +99,7 @@ classdef class_randomforest_GA
             children = obj.get_children();
             
             acc = obj.evaluate_method(children);
-            for i = 1 : obj.children_size
-               if sum(ismember(obj.population_list, children(i, :), 'rows')) > 0
-                   acc(i) = 0;
-               end
-            end
+            acc(ismember(children, obj.population_list, 'rows')) = 0;
             
             tmp_value = vertcat(obj.parent_value, acc);
             tmp_pop = vertcat(obj.population_list, children);
