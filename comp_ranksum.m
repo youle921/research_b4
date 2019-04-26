@@ -1,5 +1,5 @@
-filepath = 'rf_ga\result\';
-list = dir([filepath  'validation*.csv']);
+filepath = 'rf_ga\result_v2\';
+list = dir([filepath  'oob*.csv']);
 
 for i = 1 : length(list)
 
@@ -12,7 +12,7 @@ for i = 1 : length(list)
     if h
         disp("有意水準5％で中央値が等しくない")
     else
-        disp("有意水準5％で中央値が等しいという仮説が棄却できない")
+        disp("有意水準5％で中央値が等しくないという仮説が棄却できない")
     end
 
     disp(p)
@@ -22,7 +22,7 @@ for i = 1 : length(list)
     if h
         disp("有意水準5％で中央値が等しくない")
     else
-        disp("有意水準5％で中央値が等しいという仮説が棄却できない")
+        disp("有意水準5％で中央値が等しくないという仮説が棄却できない")
     end
 
     disp(p)
