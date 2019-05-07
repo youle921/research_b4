@@ -1,4 +1,4 @@
-mkdir result
+mkdir result_v2
 
 datalist = ["Vehicle" "Pima" "Vowel" "Heart" "Glass" "Satimage"];
 
@@ -39,7 +39,7 @@ for i = 1 : length(datalist)
 
     end
     
-    csvwrite(['result\' method '_' dataname '.csv'], acc_list);
+    csvwrite(['result_v2\' method '_' dataname '.csv'], acc_list);
     disp([dataname ' finished'])
 end
 
