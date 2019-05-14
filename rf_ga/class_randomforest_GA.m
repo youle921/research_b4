@@ -112,12 +112,16 @@ classdef class_randomforest_GA
 %         return logical index
         function children = get_children(obj)
             
+            crossover_rate = 0.9;
+            crossover_rand = rand(obj.children_size, 1);
+            
             first_parent = obj.get_parent();
             second_parent = obj.get_parent();
             
             choose_id = logical(round(rand(obj.children_size, obj.t_num)));
             children = second_parent;
             children(choose_id) = first_parent(choose_id);
+            children(crossover_rand > crossover_rate) = first_parent(crossover_rand > crossover_rate);
             
             children = obj.mutation(children);           
             
@@ -142,7 +146,7 @@ classdef class_randomforest_GA
         function new_population = mutation(obj, population, mutation_ratio)
            
             if nargin < 3
-                mutation_ratio = 1 / obj.t_num;
+                mutation_ratio = 2 / obj.t_num;
             end            
 
             new_population = population;

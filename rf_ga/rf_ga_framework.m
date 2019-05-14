@@ -1,6 +1,6 @@
-function acc = rf_ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
+function [acc, tnum] = rf_ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
 
-    tree_num = 50;
+    tree_num = 500;
     p_num = 50;
     c_num = 50;
     gen = 1000;
@@ -34,5 +34,5 @@ function acc = rf_ga_framework(seed, train_data, train_ans, test_data, test_ans,
     end
 
     acc(2) = ga_method.get_best_acc(test_data, test_ans);
-    
+    tnum = sum(ga_method.population_list(1, :));
 end

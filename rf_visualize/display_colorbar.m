@@ -1,4 +1,4 @@
-function display_colorbar(score)
+function display_colorbar(score, label)
 
     table = (0:1000) *0.001;
     table = [table; table; table].';
@@ -7,10 +7,10 @@ function display_colorbar(score)
 %     現在のグラフに指定した色でカラーバーを表示
     colormap(colorbar_array)
 %     現在のグラフのカラーバーの範囲を指定
-    caxis([min(score)*100 max(score)*100])
+    caxis([min(score) max(score)])
     
     c = colorbar;
-    c.Label.String = "Accuracy[％]";
+    c.Label.String = label;
 
 end
 
