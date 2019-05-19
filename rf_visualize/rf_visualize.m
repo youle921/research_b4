@@ -12,7 +12,7 @@ class = unique(answer);
 
 tree_num = 200;
 
-% use original_data-----------------------------
+%% use original_data----------------------------------------------
 % rng(1);
 % Mdl = TreeBagger(tree_num, data, answer,'OOBPrediction','On','Method','classification', 'ClassNames', class,...
 %     'Options', statset('UseParallel', true));
@@ -48,9 +48,9 @@ tree_num = 200;
 % xticklabels({})
 % yticklabels({})
 
-% use original_data-----------------------------
+%% use original_data----------------------------------------------
 
-% use validation_data-----------------------------
+%% use validation_data--------------------------------------------
 
 rng(1)
 cv = cvpartition(answer, 'KFold', 3);
@@ -95,7 +95,7 @@ visualize_up_to_Npercent(mds_Y, test_accuracy, 0.1, 3);
 xticklabels({})
 yticklabels({})
 
-% use validation_data-----------------------------
+%% use validation_data------------------------------------------------------
 
 figure()
 depth = get_rf_trees_depth(Mdl.Trees);

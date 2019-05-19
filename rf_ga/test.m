@@ -19,7 +19,7 @@ test_ans = answer(cv.test(1), :);
 seed = i;
 method = 'validation';
 
-tree_num = 50;
+tree_num = 500;
 p_num = 50;
 c_num = 50;
 gen = 10;
@@ -55,3 +55,5 @@ disp(dataname)
 disp({'init' acc(1)})
 disp({'obtain' acc(2)})
 disp({'origin' acc(3)})
+
+sum(ga_method.population_list(1, :))
