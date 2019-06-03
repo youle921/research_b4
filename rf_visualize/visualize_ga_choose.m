@@ -22,11 +22,11 @@ for i = 1 : length(datalist)
     seed = i;
     method = 'validation';
 
-    [rf, params] = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method);
+    [params] = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method);
     
     rf_predict_list = cell(200, height(train_ans));
     for t = 1 : 200
-        rf_predict_list(t, :) = predict(rf.Trees{t}, train_data);
+        rf_predict_list(t, :) = predict(params.rf_model.Trees{t}, train_data);
     end
     
     rf_predict_list = cellfun(@str2num, rf_predict_list);
@@ -42,6 +42,9 @@ for i = 1 : length(datalist)
    
     saveas(gcf, ['ga_chosen_' dataname], 'meta')
     close all
+    
+    strname = ['params_' dataname '.mat'];
+    save(strname, 'params')
 
 end
 

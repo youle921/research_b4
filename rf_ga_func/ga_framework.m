@@ -1,5 +1,5 @@
 % function [acc, params] = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
-function [rf_model, params] = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
+function [params] = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
 
 params.tree_num = 200;
 params.p_num = 50;
@@ -34,17 +34,17 @@ end
 
 rng(seed);
 
-rf_model = TreeBagger(params.tree_num, data.train_data, data.train_ans, 'OOBPrediction', 'on');
+params.rf_model = TreeBagger(params.tree_num, data.train_data, data.train_ans, 'OOBPrediction', 'on');
 params.pop_list = logical(round(rand(params.p_num, params.tree_num)));
-params.score = evaluate_function(rf_model, params.pop_list, data);
+params.score = evaluate_function(params.rf_model, params.pop_list, data);
 
 %% generate next gen
 for gen = 1:gen_num
-    [params.pop_list, params.score] = update_pop(params, rf_model, data, evaluate_function);
+    [params.pop_list, params.score] = update_pop(params, params.rf_model, data, evaluate_function);
 end
 
 %% get return value
-prd = rf_get_predict(rf_model, test_data, class, params.pop_list(1, :));
+prd = rf_get_predict(params.rf_model, test_data, class, params.pop_list(1, :));
 % acc = sum(prd(:, 1) == table2array(test_ans)) / height(test_ans);
 
 end
