@@ -1,6 +1,6 @@
 function [acc, tnum] = rf_ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
 
-    tree_num = 500;
+    tree_num = 250;
     p_num = 50;
     c_num = 50;
     gen = 1000;
