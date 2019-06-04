@@ -3,7 +3,7 @@ addpath('..\rf_ga_func')
 
 datalist = ["Vehicle" "Pima" "vowel" "heart" "glass" "Satimage"];
 
-for i = 1 : length(datalist)
+for i = 1 : 2
 
     dataname = char(datalist(i));
     filename = [dataname '.csv']; 
@@ -48,3 +48,4 @@ for i = 1 : length(datalist)
 
 end
 
+exit
