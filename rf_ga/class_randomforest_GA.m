@@ -3,8 +3,8 @@ classdef class_randomforest_GA
 
         train_data
         train_ans
-        validation_data
-        validation_ans
+%         validation_data
+%         validation_ans
         class_list
         
         rf_model
@@ -18,6 +18,10 @@ classdef class_randomforest_GA
         population_list
         parent_value
         evaluate_method
+        
+        train_predict
+        validation_predict
+        oob_predict
         
     end
    
@@ -51,9 +55,10 @@ classdef class_randomforest_GA
             end
             
             if strcmp(evaluate_method, 'validation')
-                obj.validation_data = valid_data;
-                obj.validation_ans = valid_ans;
+%                 obj.validation_data = valid_data;
+%                 obj.validation_ans = valid_ans;
                 obj.evaluate_method = @obj.validation_evaluation;
+                obj.validation_predict = get_predict(obj.trees, valid_data, valid_ans, obj.class_list);
             end
 
             obj.parent_value = obj.evaluate_method(obj.population_list);

@@ -1,6 +1,4 @@
  function predict_list = rf_get_predict(mdl, data, class_list, weight)
-            
-    class_list = table2array(class_list);
     
     if nargin < 4
         [~, prd_tmp] = predict(mdl, data);

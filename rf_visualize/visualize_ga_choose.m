@@ -10,7 +10,7 @@ for i = 1 : 2
     T = readtable(filename);
     data = T(:, 1:size(T, 2) - 1);
     answer = T(:, size(T, 2));
-    class = unique(answer);
+    class = table2array(unique(answer));
 
     rng(10)
     cv = cvpartition(answer{:,1}, 'KFold', 4);

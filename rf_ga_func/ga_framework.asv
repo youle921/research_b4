@@ -40,10 +40,10 @@ end
 
 if strcmp(method, 'oob')
     prd_array = zeros(height(train_ans), length(class), params.tree_num);
-    for t = 1 : params.tree_num
-        [~, prd_array(:, :, t)] = predict(params.rf_model, train_data);
-        prd_array(params.rf_model.OOBIndices(:, t) , :, t) = 0;
-    end
+    for t = 1 : params.tree_
+    [~, prd_array(:, :, t)] = predict(params.rf_model, train_data);
+    prd_array(params.rf_mdl.OOBIndices(:, t) , :, t) = 0;
+    
     score_ans = train_ans;
 end
 
