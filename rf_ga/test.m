@@ -10,7 +10,7 @@ filename = [dataname '.csv'];
 T = readtable(filename);
 data = T(:, 1:size(T, 2) - 1);
 answer = T(:, size(T, 2));
-class = unique(answer);
+class = table2array(unique(answer));
 
 rng(10)
 cv = cvpartition(answer{:,1}, 'KFold', 4);
@@ -22,4 +22,4 @@ test_ans = answer(cv.test(1), :);
 seed = i;
 method = 'validation';
 
-ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
+p = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method);

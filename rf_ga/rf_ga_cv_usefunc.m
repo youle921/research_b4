@@ -9,10 +9,10 @@ method_list = {'oob', 'validation'};
 cv_num = 2;
         
 for method_no = 1 : length(method_list)
-    
+
     method = method_list{method_no};
-    
-    for i = 1 : length(datalist) - 5
+
+    for i = 6
 
         dataname = char(datalist(i));
         filename = [dataname '.csv']; 

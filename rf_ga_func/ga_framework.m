@@ -4,7 +4,7 @@ function params = ga_framework(seed, train_data, train_ans, test_data, test_ans,
 params.tree_num = 30;
 params.p_num = 50;
 params.c_num = 50;
-gen_num = 10;
+gen_num = 1000;
 
 if strcmp(method, 'validation')
     rng(seed)
@@ -30,41 +30,54 @@ params.pop_list = logical(round(rand(params.p_num, params.tree_num)));
 % get predict array
 
 if strcmp(method, 'validation')
-    prd_array = zeros(height(valid_ans), length(class), params.tree_num);
+    prd_array = cell(height(valid_ans), params.tree_num);
     for t = 1 : params.tree_num
-        [~, prd_array(:, :, t)] = predict(params.rf_model, valid_data);
+        prd_array(:, t) = predict(params.rf_model.Trees{t}, valid_data);
     end
-    
+    prd_array = cellfun(@str2num, prd_array);
     score_ans = valid_ans;
 end
 
 if strcmp(method, 'oob')
-    prd_array = zeros(height(train_ans), length(class), params.tree_num);
+    prd_array = cell(height(train_ans), params.tree_num);
     for t = 1 : params.tree_num
-        [~, prd_array(:, :, t)] = predict(params.rf_model, train_data);
-        prd_array(params.rf_model.OOBIndices(:, t) , :, t) = 0;
+        prd_array(:, t) = predict(params.rf_model.Trees{t}, train_data);
     end
+    
+    prd_array = cellfun(@str2num, prd_array);    
+    prd_array(params.rf_model.OOBIndices) = 0;
     score_ans = train_ans;
 end
 
 params.score = aggregate_function(params.pop_list, prd_array, score_ans, class);
 
 %% generate next gen
+
+acc_max = zeros(gen_num, 1);
+acc_avg = zeros(gen_num, 1);
+
 for gen = 1:gen_num
     [params.pop_list, params.score] = update_pop(params, prd_array, score_ans, class);
+    acc_max(gen) = params.score(1);
+    acc_avg(gen) = mean(params.score);
 end
 
 %% get return value
 % prd = rf_get_predict(params.rf_model, test_data, class, params.pop_list(1, :));
 % acc = sum(prd(:, 1) == table2array(test_ans)) / height(test_ans);
 
+figure(1)
+plot(acc_max)
+figure(2)
+plot(acc_avg)
+
 end
 
-function [pop_list, score] = update_pop(params, prd, answer, class)
+function [pop_list, score] = update_pop(params, prd, answer)
 
     children = get_children(params);
 
-    c_score = aggregate_function(children, prd, answer, class);
+    c_score = aggregate_function(children, prd, answer);
     c_score(ismember(children, params.pop_list, 'rows')) = 0;
 
     tmp_value = vertcat(params.score, c_score);
@@ -120,14 +133,16 @@ function new_population = mutation(population, mutation_ratio)
 end   
 
 %% evaluate functions
-function acc = aggregate_function(id, prd, answer, class)
+function acc = aggregate_function(id, prd, answer)
 
-t_num = size(id, 1);
-acc = zeros(t_num, 1);
+p_num = size(id, 1);
+acc = zeros(p_num, 1);
     
-for i = 1:t_num
-    [~, prd_tmp] = max(sum(prd(:, :, id(i)), 3), [], 2);
-    acc(i) = sum(class(prd_tmp, 1) == table2array(answer));
+answer = table2array(answer);
+
+for i = 1:p_num
+    prd_tmp = mode(prd(:, id(i, :)), 2);
+    acc(i) = mean(prd_tmp == answer);
 end
 
 end
