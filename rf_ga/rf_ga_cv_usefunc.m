@@ -1,6 +1,7 @@
 addpath('..\dataset')
 addpath('..\rf_ga_func')
 
+<<<<<<< HEAD
 t_num_list = [100 150 200 250 300];
 
 datalist = ["Vehicle" "Pima" "heart" "glass" "Satimage"];
@@ -15,6 +16,21 @@ for t_no = 1 : length(t_num_list)
     mkdir(dirname);
 
     for i = 1 : length(datalist)
+=======
+t_num_list = [100 150 200 250 300 350 400 450 500];
+
+datalist = ["Vehicle" "Pima" "heart" "glass" "Satimage"];
+cv_num = 2;
+method = 'oob';
+    
+for t_num = 1 : length(t_num_list)
+
+
+    dirname = ['result_t' (int2str(t_num_list(t_num)))];
+    mkdir(dirname);
+
+    parfor i = 1 : length(datalist)
+>>>>>>> dab754f424f9978317251ec2790fdcd272379190
 
         dataname = char(datalist(i));
         filename = [dataname '.csv']; 
