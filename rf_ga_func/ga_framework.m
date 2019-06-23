@@ -1,7 +1,7 @@
 % function acc = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
-function params = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
+function params = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method, tree_num)
 
-params.tree_num = 30;
+params.tree_num = tree_num;
 params.p_num = 50;
 params.c_num = 50;
 gen_num = 1000;
@@ -27,7 +27,7 @@ rng(seed);
 params.rf_model = TreeBagger(params.tree_num, train_data, train_ans, 'OOBPrediction', 'on');
 params.pop_list = logical(round(rand(params.p_num, params.tree_num)));
 
-% get predict array
+%% get predict array
 
 if strcmp(method, 'validation')
     prd_array = cell(height(valid_ans), params.tree_num);
@@ -45,31 +45,20 @@ if strcmp(method, 'oob')
     end
     
     prd_array = cellfun(@str2num, prd_array);    
-    prd_array(params.rf_model.OOBIndices) = 0;
+    prd_array(~params.rf_model.OOBIndices) = nan;
     score_ans = train_ans;
 end
 
-params.score = aggregate_function(params.pop_list, prd_array, score_ans, class);
+params.score = aggregate_function(params.pop_list, prd_array, score_ans);
 
 %% generate next gen
-
-acc_max = zeros(gen_num, 1);
-acc_avg = zeros(gen_num, 1);
-
 for gen = 1:gen_num
-    [params.pop_list, params.score] = update_pop(params, prd_array, score_ans, class);
-    acc_max(gen) = params.score(1);
-    acc_avg(gen) = mean(params.score);
+    [params.pop_list, params.score] = update_pop(params, prd_array, score_ans);
 end
 
 %% get return value
 % prd = rf_get_predict(params.rf_model, test_data, class, params.pop_list(1, :));
 % acc = sum(prd(:, 1) == table2array(test_ans)) / height(test_ans);
-
-figure(1)
-plot(acc_max)
-figure(2)
-plot(acc_avg)
 
 end
 
