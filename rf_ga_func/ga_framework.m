@@ -1,7 +1,7 @@
 % function acc = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
 function params = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
 
-params.tree_num = 30;
+params.tree_num = 20;
 params.p_num = 50;
 params.c_num = 50;
 gen_num = 1000;
@@ -14,9 +14,11 @@ if strcmp(method, 'validation')
     train_data = train_data(~cv.test(1), :);
     train_ans = train_ans(~cv.test(1), :);
     
-%     confirm program
-%     valid_data = test_data;
-%     valid_ans = test_ans;
+% confirm program
+elseif strcmp(method, 'validation_test')
+
+    valid_data = test_data;
+    valid_ans = test_ans;
     
 end
 
@@ -24,12 +26,13 @@ end
 
 rng(seed);
 
-params.rf_model = TreeBagger(params.tree_num, train_data, train_ans, 'OOBPrediction', 'on');
+params.rf_model = TreeBagger(params.tree_num, train_data, train_ans, ...
+    'OOBPrediction', 'on');
 params.pop_list = logical(round(rand(params.p_num, params.tree_num)));
 
 % get predict array
 
-if strcmp(method, 'validation')
+if strcmp(method, 'validation') || strcmp(method, 'validation_test')
     prd_array = cell(height(valid_ans), params.tree_num);
     for t = 1 : params.tree_num
         prd_array(:, t) = predict(params.rf_model.Trees{t}, valid_data);
@@ -49,7 +52,7 @@ if strcmp(method, 'oob')
     score_ans = train_ans;
 end
 
-params.score = aggregate_function(params.pop_list, prd_array, score_ans, class);
+params.score = aggregate_function(params.pop_list, prd_array, score_ans);
 
 %% generate next gen
 
@@ -57,7 +60,7 @@ acc_max = zeros(gen_num, 1);
 acc_avg = zeros(gen_num, 1);
 
 for gen = 1:gen_num
-    [params.pop_list, params.score] = update_pop(params, prd_array, score_ans, class);
+    [params.pop_list, params.score] = update_pop(params, prd_array, score_ans);
     acc_max(gen) = params.score(1);
     acc_avg(gen) = mean(params.score);
 end
@@ -66,10 +69,10 @@ end
 % prd = rf_get_predict(params.rf_model, test_data, class, params.pop_list(1, :));
 % acc = sum(prd(:, 1) == table2array(test_ans)) / height(test_ans);
 
-figure(1)
-plot(acc_max)
-figure(2)
-plot(acc_avg)
+% figure(1)
+% plot(acc_max)
+% figure(2)
+% plot(acc_avg)
 
 end
 

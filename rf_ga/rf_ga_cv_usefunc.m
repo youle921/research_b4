@@ -1,18 +1,19 @@
 addpath('..\dataset')
 addpath('..\rf_ga_func')
 
-dirname = 'result_t250test';
-mkdir(dirname);
+t_num_list = [100 150 200 250 300 350 400 450 500];
 
-datalist = ["Vehicle" "Pima" "vowel" "heart" "glass" "Satimage"];
-method_list = {'oob', 'validation'};
+datalist = ["Vehicle" "Pima" "heart" "glass" "Satimage"];
 cv_num = 2;
-        
-for method_no = 1 : length(method_list)
+method = 'oob';
+    
+for t_num = 1 : length(t_num_list)
 
-    method = method_list{method_no};
 
-    for i = 6
+    dirname = ['result_t' (int2str(t_num_list(t_num)))];
+    mkdir(dirname);
+
+    parfor i = 1 : length(datalist)
 
         dataname = char(datalist(i));
         filename = [dataname '.csv']; 
