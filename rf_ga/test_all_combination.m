@@ -11,8 +11,6 @@ mkdir(result_dir)
 datalist = {'Vehicle' 'Pima' 'heart' 'glass' 'Satimage'};
 
 for d = 1 : length(datalist)
-    
-    tic
 
     filename = [datalist{d} '.csv']; 
     T = readtable(filename);
@@ -67,8 +65,9 @@ for d = 1 : length(datalist)
     acc = acc(2 : cmb_num);
     
     save_dir = [result_dir '\' datalist{d}];
-    save('acc_list', 'acc');
-    save('ga_params', 'params');
+    mkdir(save_dir)
+    save([save_dir '\acc_list'], 'acc');
+    save([save_dir '\ga_params'], 'params');
 
 end
 
