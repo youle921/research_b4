@@ -1,11 +1,7 @@
 % function acc = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method)
 function params = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, method, tree_num)
 
-<<<<<<< HEAD
 params.tree_num = tree_num;
-=======
-params.tree_num = 20;
->>>>>>> dab754f424f9978317251ec2790fdcd272379190
 params.p_num = 50;
 params.c_num = 50;
 gen_num = 1000;
@@ -61,25 +57,12 @@ params.score = aggregate_function(params.pop_list, prd_array, score_ans);
 %% generate next gen
 for gen = 1:gen_num
     [params.pop_list, params.score] = update_pop(params, prd_array, score_ans);
-<<<<<<< HEAD
-=======
-    acc_max(gen) = params.score(1);
-    acc_avg(gen) = mean(params.score);
->>>>>>> dab754f424f9978317251ec2790fdcd272379190
 end
 
 %% get return value
 % prd = rf_get_predict(params.rf_model, test_data, class, params.pop_list(1, :));
 % acc = sum(prd(:, 1) == table2array(test_ans)) / height(test_ans);
 
-<<<<<<< HEAD
-=======
-% figure(1)
-% plot(acc_max)
-% figure(2)
-% plot(acc_avg)
-
->>>>>>> dab754f424f9978317251ec2790fdcd272379190
 end
 
 function [pop_list, score] = update_pop(params, prd, answer)
