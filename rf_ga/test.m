@@ -7,7 +7,7 @@ addpath('..\rf_ga_func')
 
 datalist = ["Vehicle" "Pima" "vowel" "heart" "glass" "Satimage"];
 
-i = 3;
+i = 2;
     
 dataname = char(datalist(i));
 filename = [dataname '.csv']; 
@@ -25,7 +25,7 @@ test_ans = answer(cv.test(1), :);
 
 seed = i;
 
-params = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, 'validation_test');
+params = ga_framework(seed, train_data, train_ans, test_data, test_ans, class, 'validation_test', tree_num);
 mdl = params.rf_model;
 
 cmb_num = 2^tree_num;
@@ -69,7 +69,8 @@ ga_acc = params.score;
 
 histogram(acc, unique(acc));
 xlabel('Accuracy');
-ylabel('Number of Combinations')
+ylabel('Number of Classifier')
+set(gca, 'Fontsize', 24);
 
 datetime
 
@@ -81,7 +82,10 @@ h2 = histogram(ga_acc, unique(acc));
 h1.Normalization = 'probability';
 h2.Normalization = 'probability';
 xlabel('Accuracy');
-ylabel('Probability of Combinations')
+ylabel('Probability of Classifier')
+    
+legend('All Classifiers', 'Obtained Classifiers')
+set(gca, 'Fontsize', 24);
 
 %% func to parallel
 function acc_list = get_acc(mdl, data, answer, id)
