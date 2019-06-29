@@ -70,7 +70,10 @@ function [pop_list, score] = update_pop(params, prd, answer)
     children = get_children(params);
 
     c_score = aggregate_function(children, prd, answer);
+    
     c_score(ismember(children, params.pop_list, 'rows')) = 0;
+    [~, unique_id] = unique(children, 'stable', 'rows');
+    c_score(~ismember(1 : params.tree_num, unique_id)) = 0;
 
     tmp_value = vertcat(params.score, c_score);
     tmp_pop = vertcat(params.pop_list, children);
