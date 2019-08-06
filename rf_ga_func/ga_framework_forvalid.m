@@ -1,4 +1,4 @@
-function params, acc_list = ga_framework(seed, train_data, train_ans, tree_num, method_params, test_data, test_ans)
+function [params, acc_list] = ga_framework_forvalid(seed, train_data, train_ans, tree_num, method_params, test_data, test_ans)
 
 params.tree_num = tree_num;
 params.p_num = 50;
@@ -32,9 +32,6 @@ params.rf_model = TreeBagger(params.tree_num, train_data, train_ans, ...
     'OOBPrediction', 'on', 'InBagFraction', method_params.choose_ratio);
 params.pop_list = logical(round(rand(params.p_num, params.tree_num)));
 
-acc_list = zeros(gen_num, 4);
-acc_list(1, 1) = 
-
 %% get predict array
 
 if strcmp(method_params.name, 'validation') || strcmp(method_params.name, 'validation_test')
@@ -44,6 +41,13 @@ if strcmp(method_params.name, 'validation') || strcmp(method_params.name, 'valid
     end
     prd_array = cellfun(@str2num, prd_array);
     score_ans = valid_ans;
+    
+    test_prd_array = cell(height(test_ans), params.tree_num);
+    for t = 1 : params.tree_num
+        test_prd_array(:, t) = predict(params.rf_model.Trees{t}, test_data);
+    end
+    test_prd_array = cellfun(@str2num, test_prd_array);
+    
 end
 
 if strcmp(method_params.name, 'oob')
@@ -58,10 +62,25 @@ if strcmp(method_params.name, 'oob')
 end
 
 params.score = aggregate_function(params.pop_list, prd_array, score_ans);
+test_score = aggregate_function(params.pop_list, test_prd_array, test_ans);
+
+acc_list = zeros(gen_num, 4);
+
+[acc_list(1, 1), max_id] = max(params.score);
+acc_list(1, 2) = mean(params.score);
+
+acc_list(1, 3) = test_score(max_id);
+acc_list(1, 4) = mean(test_score);
 
 %% generate next gen
 for gen = 1:gen_num
     [params.pop_list, params.score] = update_pop(params, prd_array, score_ans);
+    acc_list(gen + 1, 1) = max(params.score);
+    acc_list(gen + 1, 2) = mean(params.score);
+    
+    test_score = aggregate_function(params.pop_list, test_prd_array, test_ans);
+    acc_list(gen + 1, 3) = test_score(1);
+    acc_list(gen + 1, 4) = mean(test_score);
 end
 
 end
