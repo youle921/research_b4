@@ -58,4 +58,16 @@ classdef ELM
     end
     
 end
+
+function o = sigmoid(data)
+
+    o = 1 / (1 + exp(-1 * data));
+
+end
+
+function o = ReLU(data)
+
+    o = max(data, 0);
+    
+end
     
