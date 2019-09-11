@@ -1,9 +1,3 @@
-params.tree_num = 30;
-params.p_num = 50;
-
-pop = uniformly_pop(params);
-s = sum(pop, 2);
-
 function [params, acc_list] = ga_framework(seed, train_data, train_ans, tree_num, method_params, test_data, test_ans)
 
 params.tree_num = tree_num;

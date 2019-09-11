@@ -1,4 +1,4 @@
-function [params, acc_list] = ga_framework_forvalid(seed, train_data, train_ans, tree_num, method_params, test_data, test_ans)
+function params = ga_framework_forvalid(seed, train_data, train_ans, tree_num, method_params, test_data, test_ans)
 
 params.tree_num = tree_num;
 params.p_num = 50;
@@ -30,8 +30,14 @@ rng(seed);
 
 params.rf_model = TreeBagger(params.tree_num, train_data, train_ans, ...
     'OOBPrediction', 'on', 'InBagFraction', method_params.choose_ratio);
-params.pop_list = logical(round(rand(params.p_num, params.tree_num)));
 
+if method_params.init == 1
+    params.pop_list = uniformly_pop(params);
+elseif method_params.init == 2
+    params.pop_list = contain_pop(params);
+else
+    params.pop_list = logical(round(rand(params.p_num, params.tree_num)));
+end
 %% get predict array
 
 if strcmp(method_params.name, 'validation') || strcmp(method_params.name, 'validation_test')
@@ -42,11 +48,11 @@ if strcmp(method_params.name, 'validation') || strcmp(method_params.name, 'valid
     prd_array = cellfun(@str2num, prd_array);
     score_ans = valid_ans;
     
-    test_prd_array = cell(height(test_ans), params.tree_num);
-    for t = 1 : params.tree_num
-        test_prd_array(:, t) = predict(params.rf_model.Trees{t}, test_data);
-    end
-    test_prd_array = cellfun(@str2num, test_prd_array);
+%     test_prd_array = cell(height(test_ans), params.tree_num);
+%     for t = 1 : params.tree_num
+%         test_prd_array(:, t) = predict(params.rf_model.Trees{t}, test_data);
+%     end
+%     test_prd_array = cellfun(@str2num, test_prd_array);
     
 end
 
@@ -62,27 +68,44 @@ if strcmp(method_params.name, 'oob')
 end
 
 params.score = aggregate_function(params.pop_list, prd_array, score_ans);
-test_score = aggregate_function(params.pop_list, test_prd_array, test_ans);
-
-acc_list = zeros(gen_num, 4);
-
-[acc_list(1, 1), max_id] = max(params.score);
-acc_list(1, 2) = mean(params.score);
-
-acc_list(1, 3) = test_score(max_id);
-acc_list(1, 4) = mean(test_score);
+% test_score = aggregate_function(params.pop_list, test_prd_array, test_ans);
 
 %% generate next gen
 for gen = 1:gen_num
     [params.pop_list, params.score] = update_pop(params, prd_array, score_ans);
-    acc_list(gen + 1, 1) = max(params.score);
-    acc_list(gen + 1, 2) = mean(params.score);
-    
-    test_score = aggregate_function(params.pop_list, test_prd_array, test_ans);
-    acc_list(gen + 1, 3) = test_score(1);
-    acc_list(gen + 1, 4) = mean(test_score);
 end
 
+end
+
+function init_pop = uniformly_pop(params)
+
+    init_pop = zeros(params.p_num, params.tree_num);
+    n = fix(params.p_num / params.tree_num);
+    m = mod(params.p_num, params.tree_num);
+    
+    current_num = 0;
+    for i = 1 : n        
+        for j = 1 : params.tree_num
+            init_pop(current_num + j, randperm(params.tree_num, j)) = 1;
+        end
+        current_num = i * params.tree_num;
+    end
+    
+    rand_id = randperm(params.tree_num, m);
+    for i = 1 : m
+        init_pop(current_num + i, randperm(params.tree_num, rand_id(i))) = 1;
+    end
+    
+    init_pop = logical(init_pop);
+end
+
+function init_pop = contain_pop(params)
+    init_pop = zeros(params.p_num, params.tree_num);
+    init_pop(1 : params.p_num - 2, :) = logical(round(rand(params.p_num - 2, params.tree_num)));
+    init_pop(params.p_num - 1, randi(params.tree_num, 1)) = 1;
+    init_pop(params.p_num, :) = 1;
+    
+    init_pop = logical(init_pop);
 end
 
 function [pop_list, score] = update_pop(params, prd, answer)
