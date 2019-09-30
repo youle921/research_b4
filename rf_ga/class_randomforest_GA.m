@@ -1,15 +1,16 @@
 classdef class_randomforest_GA
     properties
 
-        train_data
-        train_ans
+        data
+        ans
 %         validation_data
 %         validation_ans
-        class_list
+        class_num
+        sep
         
-        rf_model
-        t_num
-        trees
+        init_function
+        
+        params
         
         weight_list
         children_size
@@ -26,21 +27,59 @@ classdef class_randomforest_GA
     end
    
     methods
-       
-        function obj = class_randomforest_GA(seed, tree_num, train_data, train_ans, class_list, p_size, c_size, evaluate_method, valid_data, valid_ans)
-           
-            obj.t_num = tree_num;
-
-            obj.train_data = train_data;
-            obj.train_ans = train_ans; 
-            obj.class_list = class_list;
+        
+        function obj = class_randomforest_GA(data, answer)
             
-            obj.population_size = p_size;
-            obj.children_size = c_size;
+            obj.data = data;
+            obj.ans = answer;
+            obj.class_num = length(unique(obj.ans));
+            
+        end
+        
+        function obj = set_separator(obj, seed)
             
             rng(seed);
+            obj.sep = cvpartition(obj.ans{:, 1}, 'KFold', 10);
+            
+        end
+        
+        function obj = set_GA(obj, code, strategy)
+            
+            if strcmp(code, 'bin')
+                obj.init_function = @init_binary;
+                
+                if strcmp(strategy, 'mutation')
+                    obj.updata_function = @mutation;
+                else
+                    obj.updata_function = @UXwithMutation;
+                
+            else
+                obj.init_function = @init_real;
+                obj.updata_function = @SBXwithPM;
+            end
+            
+        end
 
-            obj.rf_model = TreeBagger(obj.t_num, obj.train_data, obj.train_ans, 'OOBPrediction', 'on', ...
+        function obj = GA(obj, seed, no, method_params)
+            
+            train_data = obj.data(~obj.sep(no), :);
+            train_ans = obj.data(obj.sep(no), :);
+            
+            if strcmp(method_params.name, 'validation')
+                rng(seed)
+                cv = cvpartition(obj.ans{~obj.sep.test(no), 1}, 'KFold', 9);
+                valid_data = train_data(cv.test(1), :);
+                valid_ans = train_ans(cv.test(1), :);   
+                train_data = train_data(~cv.test(1), :);
+                train_ans = train_ans(~cv.test(1), :);
+
+                method_params.choose_ratio = 1.0;
+            
+            end
+
+            rng(seed);
+
+            obj.params.rf_model = TreeBagger(obj.params.t_num, obj.data(obj.sep.test(no),:), obj.train_ans, 'OOBPrediction', 'on', ...
                   'Method','classification', 'ClassName', obj.class_list);
             obj.trees = obj.rf_model.Trees;
             
@@ -113,52 +152,24 @@ classdef class_randomforest_GA
             obj.parent_value = tmp_value(id(1 : obj.population_size));
             
         end
-
-%         return logical index
-        function children = get_children(obj)
-            
-            crossover_rate = 0.9;
-            crossover_rand = rand(obj.children_size, 1);
-            
-            first_parent = obj.get_parent();
-            second_parent = obj.get_parent();
-            
-            choose_id = logical(round(rand(obj.children_size, obj.t_num)));
-            children = second_parent;
-            children(choose_id) = first_parent(choose_id);
-            children(crossover_rand > crossover_rate) = first_parent(crossover_rand > crossover_rate);
-            
-            children = obj.mutation(children);           
-            
-        end
         
 %         tournament selection
 %         return chosen logical index
         function parent = get_parent(obj)
             
             parent_id = randi(obj.population_size, obj.children_size, 2);
-            
+            %% select winner
             [~, winner] = max(obj.parent_value(parent_id), [], 2);
+            
+            %% search same value parent
             [~, tmp] = max(fliplr(obj.parent_value(parent_id)), [], 2);
-            cnt = sum(winner == tmp);
-            winner(winner == tmp) = randi(2, cnt, 1);
+            draw_cnt = sum(winner == tmp);
+            winner(winner == tmp) = randi(2, draw_cnt, 1);
             
             chosen_parent = diag(parent_id(:, winner)); %”z—ñ‘€ì‚ª‚í‚©‚ç‚È‚¢‚Ì‚Å‚â‚Á‚Â‚¯
             parent = obj.population_list(chosen_parent, :);      
             
-        end
-        
-        function new_population = mutation(obj, population, mutation_ratio)
-           
-            if nargin < 3
-                mutation_ratio = 2 / obj.t_num;
-            end            
-
-            new_population = population;
-            mutation_index = rand(obj.children_size, obj.t_num) < mutation_ratio;
-            new_population(mutation_index) = ~population(mutation_index);
-            
-        end        
+        end      
         
         function acc = get_best_acc(obj, data, answer)
             [~, best_index] = max(obj.parent_value);
@@ -173,6 +184,34 @@ classdef class_randomforest_GA
             tmp = get_predict(obj.trees, data, obj.class_list);
             acc = sum(tmp(:, 1) == answer) / length(answer);
         end
+        
+        function prd_array = get_prd_array(obj, data)
+            
+            prd_array = zeros(size(data, 1), obj.class_num, obj.params.tree_num);
+            for t = 1 : obj.params.tree_num
+                [~, prd_array(:, :, t)] = predict(obj.params.rf_model.Trees{t}, data);
+            end
+            
+        end
+        
+        function prd_array = get_oob_prd_array(obj, data)
+
+            prd_array = get_prd_array(data);
+            for t = 1 : obj.params.tree_num
+                oob_array = repmat(obj.params.rf_model.OOBIndices(:, t), 1, obj.class_num);
+                prd_array(:, :, t) = prd_array(:, :, t) .* oob_array;
+            end
+            
+        end
+
+        function prd = aggrigate_prediction(obj, prd_array, weight)
+            
+            data_num = size(prd_array, 1);
+            weight = reshape(repelem(weight, data_num, obj.class_num), data_num, obj.class_num, []);
+            prd = max(sum(prd_array .* weight, 3), [], 2);
+            
+        end
+                
     end
     
 end
