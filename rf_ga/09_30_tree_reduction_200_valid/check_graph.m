@@ -1,7 +1,7 @@
 datalist = {'Vehicle' 'Pima' 'heart' 'glass' 'Satimage'};
 
-valid_name = '\valid_curve_';
-test_name = '\test_curve_';
+valid_name = '\valid_curve';
+test_name = '\test_curve';
 ext = '.csv';
 
 for d = datalist

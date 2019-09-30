@@ -3,10 +3,10 @@ addpath('..\rf_ga_func')
 
 datalist = {'Vehicle' 'Pima' 'heart' 'glass' 'Satimage'};
 
-tree_num = 50;
+tree_num = 200;
 cv_num = 2;
 
-path = [char(datetime('now', 'Format', 'MM_dd')) '_tree_reduction_50'];
+path = [char(datetime('now', 'Format', 'MM_dd')) '_tree_reduction_200_OOB'];
 mkdir(path)
 
 for i = 1 : length(datalist)
@@ -24,7 +24,7 @@ for i = 1 : length(datalist)
         rng(cv_cnt)
         cv = cvpartition(answer{:,1}, 'KFold', 10);
 
-        parfor cv_trial = 1 : 10
+        for cv_trial = 1 : 10
             
             train_data = data(~cv.test(cv_trial), :);
             test_data = data(cv.test(cv_trial), :);
@@ -33,12 +33,12 @@ for i = 1 : length(datalist)
 
             c_try_num = cv_trial + 10 * (cv_cnt - 1);
             seed = c_try_num;
-            
-            valid_cv = cvpartition(train_ans{:, 1}, 'KFold', 9);
-            valid_data = train_data(valid_cv.test(1), :);
-            valid_ans = train_ans(valid_cv.test(1), :);   
-            train_data = train_data(~valid_cv.test(1), :);
-            train_ans = train_ans(~valid_cv.test(1), :);
+%             
+%             valid_cv = cvpartition(train_ans{:, 1}, 'KFold', 9);
+%             valid_data = train_data(valid_cv.test(1), :);
+%             valid_ans = train_ans(valid_cv.test(1), :);   
+%             train_data = train_data(~valid_cv.test(1), :);
+%             train_ans = train_ans(~valid_cv.test(1), :);
 
             mdl = TreeBagger(tree_num, train_data, train_ans, 'Method', 'classification', ...
                   'OOBPrediction', 'on');
@@ -46,11 +46,11 @@ for i = 1 : length(datalist)
             use_index = 1 : tree_num;
             weight = ones(tree_num, 1);
             
-            valid_prd = get_prd_array(mdl, valid_data);
+            oob_prd = get_oob_prd_array(mdl, train_data);
             test_prd = get_prd_array(mdl, test_data);
             
-            valid_curve = zeros(tree_num, 1);
-            valid_curve(1) = accuracy(valid_prd, valid_ans, weight);
+            oob_curve = zeros(tree_num, 1);
+            oob_curve(1) = accuracy(oob_prd, train_ans, weight);
             test_curve = zeros(tree_num, 1);
             test_curve(1) = accuracy(test_prd, test_ans, weight);
             
@@ -60,7 +60,7 @@ for i = 1 : length(datalist)
                 for out = 1 : length(use_index)
                     w = weight;
                     w(use_index(out)) = 0;
-                    score(out) = accuracy(valid_prd, valid_ans, w);
+                    score(out) = accuracy(oob_prd, train_ans, w);
                 end
                 
                 [max_score, max_id] = max(score);
@@ -68,13 +68,13 @@ for i = 1 : length(datalist)
                 weight(use_index(max_id)) = 0;
                 use_index(max_id) = [];
 
-                valid_curve(t + 1) = max_score;
+                oob_curve(t + 1) = max_score;
                 test_curve(t + 1) = accuracy(test_prd, test_ans, weight);
 
             end
             
-            csvwrite([current_path '\valid_curve_' num2str(c_try_num), '.csv'], valid_curve);
-            csvwrite([current_path '\test_curve_' num2str(c_try_num), '.csv'], test_curve);
+            csvwrite([current_path '\oob_curve' num2str(c_try_num), '.csv'], oob_curve);
+            csvwrite([current_path '\test_curve' num2str(c_try_num), '.csv'], test_curve);
 
         end
         
@@ -97,8 +97,19 @@ function acc = accuracy(prd_array, answer, weight)
 
     [data_num, class_num, ~] = size(prd_array);
     weight = reshape(repelem(weight, data_num, class_num), data_num, class_num, []);
-    [~, prd] = max(sum(prd_array .* weight, 3), [], 2);
+    [~, prd] = max(sum(prd_array .* weight, 3), 0.1, 2);
     
     acc = sum(prd == answer{:, :}) / height(answer);
+
+end
+
+        
+function prd_array = get_oob_prd_array(mdl, data)
+
+    prd_array = get_prd_array(mdl, data);
+    for t = 1 : mdl.NumTrees
+        oob_array = repmat(mdl.OOBIndices(:, t), 1, length(mdl.ClassNames));
+        prd_array(:, :, t) = prd_array(:, :, t) .* oob_array;
+    end
 
 end
