@@ -26,9 +26,9 @@ function Offspring = SBXwithPM(Parent1, Parent2, Parameter)
              
     %% Polynomial mutation
 %     Lower = repmat(Global.lower,2*N,1);
-    Lower = repmat([0 0], 2 * N, 1);
+    Lower = repmat(zeros(size(Parent1, 2), 1).', 2 * N, 1);
 %     Upper = repmat(Global.upper,2*N,1);
-    Upper = repmat([1 1], 2 * N, 1);
+    Upper = repmat(ones(size(Parent1, 2), 1).', 2 * N, 1);
     Site  = rand(2*N,D) < proM/D;
     mu    = rand(2*N,D);
     temp  = Site & mu<=0.5;

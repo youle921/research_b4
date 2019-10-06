@@ -1,7 +1,7 @@
 function params = set_ga_params(varargin)
 
 %% default setting
-    params.tree_num = 50;
+    params.t_num = 50;
     params.p_num = 50;
     params.c_num = 50;
     params.gen_num = 1000;

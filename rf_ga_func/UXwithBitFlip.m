@@ -1,4 +1,4 @@
-function Offspring = UXwithMutation(parent1, parent2, crossover_rate)
+function Offspring = UXwithBitFlip(parent1, parent2, crossover_rate)
 
     %% default parameter setting
     if nargin < 3
@@ -13,6 +13,6 @@ function Offspring = UXwithMutation(parent1, parent2, crossover_rate)
     Offspring(choose_id) = parent1(choose_id);
     Offspring(crossover_rand > crossover_rate, :) = parent1(crossover_rand > crossover_rate, :);
 
-    Offspring = binary_mutation(Offspring);           
+    Offspring = BitFlip(Offspring);           
 
 end

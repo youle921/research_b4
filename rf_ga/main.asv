@@ -12,7 +12,7 @@ mkdir(path)
 for m = 1 : length(method)
     
     method_params.name = method{m};
-    current_path = [path '\' method{m}];
+    current_path = [dirname '\' method{m}];
     mkdir(current_path);
 
     for i = 1 : length(datalist)
@@ -29,7 +29,7 @@ for m = 1 : length(method)
 
             base_tmp = zeros(10, 1);
             best_tmp = zeros(10, 1);
-            score_tmp = zeros(10, 1);
+            tree_tmp = zeros(10, 1);
 
             parfor cv_trial = 1 : 10
 
@@ -44,13 +44,12 @@ for m = 1 : length(method)
 
                 base_tmp(cv_trial) = ga.get_default_acc(cv_trial);
                 best_tmp(cv_trial) = ga.get_best_acc(cv_trial);
-                score_tmp(cv_trial) = max(ga.parent_value);
 
             end
 
             save_data(10 * cv_cnt - 9 : cv_cnt * 10, 1) = base_tmp;
             save_data(10 * cv_cnt - 9 : cv_cnt * 10, 2) = best_tmp;
-            save_data(10 * cv_cnt - 9 : cv_cnt * 10, 3) = score_tmp;
+            save_data(10 * cv_cnt - 9 : cv_cnt * 10, 3) = tree_tmp;
         end
 
         csvwrite([current_path '\' datalist{i} '.csv'], save_data);

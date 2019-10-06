@@ -138,7 +138,7 @@ classdef class_randomforest_GA
                 [~, test_prd_array(:, :, t)] = predict(obj.params.trees{t}, test_data);
             end
             
-            w = ones(1, obj.params.t_num);
+            w = ones(obj.params.t_num, 1);
             acc = obj.get_score(test_prd_array, w, test_ans);
             
         end
@@ -153,7 +153,7 @@ classdef class_randomforest_GA
                 [~, test_prd_array(:, :, t)] = predict(obj.params.trees{t}, test_data);
             end
             
-            w = obj.population_list(1, :);
+            w = obj.params.population_list(1, :);
             acc = obj.get_score(test_prd_array, w, test_ans);
             
         end
@@ -180,9 +180,9 @@ classdef class_randomforest_GA
         function prd = aggrigate_prediction(obj, prd_array, weight)
             
             data_num = size(prd_array, 1);
-            prd = zeros(data_num, size(weight, 1));
-            for p = 1 : size(weight, 1)
-                w = reshape(repelem(weight(p, :), data_num, obj.class_num), data_num, obj.class_num, []);
+            prd = zeros(data_num, size(weight, 2));
+            for p = 1 : size(weigit, 2)
+                w = reshape(repelem(weight(:, p), data_num, obj.class_num), data_num, obj.class_num, []);
                 [~, prd(:, p)] = max(sum(prd_array .* w, 3), [], 2);
             end
             

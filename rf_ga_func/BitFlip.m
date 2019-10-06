@@ -1,4 +1,4 @@
-function new_population = binary_mutation(population, mutation_ratio)
+function new_population = BitFlip(population, mutation_ratio)
 
     if nargin < 2
         mutation_ratio = 2 / size(population, 2);
