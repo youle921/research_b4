@@ -31,7 +31,7 @@ for m = 1 : length(method)
             best_tmp = zeros(10, 1);
             score_tmp = zeros(10, 1);
 
-            parfor cv_trial = 1 : 10
+            for cv_trial = 1 : 10
 
                 c_try_num = cv_trial + 10 * (cv_cnt - 1);
                 seed = c_try_num;
