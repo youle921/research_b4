@@ -54,7 +54,7 @@ classdef class_randomforest_GA
 
         function obj = GA(obj, seed, no, method_params)
             
-            obj.params = set_ga_params();
+            obj.params = set_ga_params('p_num', 1,'gen_num', 1000);
             
             train_data = obj.data(~obj.sep.test(no), :);
             train_ans = obj.ans(~obj.sep.test(no), :);
