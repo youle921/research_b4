@@ -4,9 +4,9 @@ addpath('..\rf_ga_func')
 datalist = {'Vehicle' 'Pima' 'heart' 'glass' 'Satimage'};
 cv_num = 2;
 
-method = {'oob' 'validation'};
+method = {'validation'};
 
-path = [char(datetime('now', 'Format', 'MM_dd')) '_classRF_mutation'];
+path = [char(datetime('now', 'Format', 'MM_dd')) '_classRF_real'];
 mkdir(path)
 
 for m = 1 : length(method)
@@ -31,14 +31,14 @@ for m = 1 : length(method)
             best_tmp = zeros(10, 1);
             score_tmp = zeros(10, 1);
 
-            for cv_trial = 1 : 10
+            parfor cv_trial = 1 : 10
 
                 c_try_num = cv_trial + 10 * (cv_cnt - 1);
                 seed = c_try_num;
                 
                 ga = class_randomforest_GA(data, answer);
-                ga = ga.set_separator(seed);
-                ga = ga.set_GA('bin', 'mutation');
+                ga = ga.set_separator(cv_cnt);
+                ga = ga.set_GA('real', ' ');
 
                 ga = ga.GA(seed, cv_trial, method_params);
 
@@ -57,7 +57,6 @@ for m = 1 : length(method)
         disp([datalist{i} ' finished'])
 
     end
-
     
 end
 
