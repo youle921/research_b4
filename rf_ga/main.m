@@ -6,7 +6,7 @@ cv_num = 2;
 
 method = {'oob' 'validation'};
 
-path = [char(datetime('now', 'Format', 'MM_dd')) '_classRF'];
+path = [char(datetime('now', 'Format', 'MM_dd')) '_classRF_real'];
 mkdir(path)
 
 for m = 1 : length(method)
@@ -38,7 +38,7 @@ for m = 1 : length(method)
                 
                 ga = class_randomforest_GA(data, answer);
                 ga = ga.set_separator(cv_cnt);
-                ga = ga.set_GA('bin', ' ');
+                ga = ga.set_GA('real', ' ');
 
                 ga = ga.GA(seed, cv_trial, method_params);
 
