@@ -20,20 +20,28 @@ for d = datalist
         valid_average_curve = valid_average_curve + valid_curve - valid_curve(1);
         test_average_curve = test_average_curve + test_curve - test_curve(1);
         
+        if i == 1
+        
 %         close all
 %         hold on
 %         
-%         [~, id] = max(valid_curve);
-%         plot(valid_curve, '-o', 'MarkerIndices', id, 'MarkerSize', 10 ,'MarkerFaceColor', [0 0.4470 0.7410]);
+%
+%         plot(valid_curve * 100, 'LineWidth', 2);
 %         
-%         [~, id] = max(test_curve);
-%         plot(test_curve, '-o', 'MarkerIndices', id, 'MarkerSize', 10 ,'MarkerFaceColor', [0.8500 0.3250 0.0980]);
+%         plot(test_curve * 100, 'LineWidth', 2);
 %         
-%         legend('valid', 'test', 'Location', 'southwest')
+%         legend('validation', 'test', 'Location', 'southwest')
 % 
 %         hold off
+		    set(gca, 'FontSize', 22);
+		    xlim([0 50]);
+		    xticklabels(string(50 : -10 : 0));
+		    
+		    xlabel('Number of trees', 'FontSize', 24);
+		    ylabel('Accuracy[Åì]', 'FontSize', 24)
+		    saveas(gcf, [d{:, :} '_first'], 'meta')
 %         
-%         pause()
+%      end
     end
     
     close all
@@ -45,14 +53,14 @@ for d = datalist
     legend('validation', 'test', 'Location', 'southwest')
 
     hold off
-    set(gca, 'FontSize', 24);
+    set(gca, 'FontSize', 22);
     xlim([0 50]);
     xticklabels(string(50 : -10 : 0));
     if strcmp(d{:,:}, 'Satimage')
         ylim([-0.4 0.1]);
     end
     
-    xlabel('Number of trees');
+    xlabel('Number of trees', 'FontSize', 22);
     ylabel('Difference from Original RF', 'FontSize', 22)
     saveas(gcf, [d{:, :} '_mean'], 'meta')
     
