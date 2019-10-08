@@ -4,9 +4,9 @@ addpath('..\rf_ga_func')
 datalist = {'Vehicle' 'Pima' 'heart' 'glass' 'Satimage'};
 cv_num = 2;
 
-method = {'validation'};
+method = {'oob' 'validation'};
 
-path = [char(datetime('now', 'Format', 'MM_dd')) '_classRF_real'];
+path = [char(datetime('now', 'Format', 'MM_dd')) '_classRF'];
 mkdir(path)
 
 for m = 1 : length(method)
@@ -38,13 +38,15 @@ for m = 1 : length(method)
                 
                 ga = class_randomforest_GA(data, answer);
                 ga = ga.set_separator(cv_cnt);
-                ga = ga.set_GA('real', ' ');
+                ga = ga.set_GA('bin', ' ');
 
                 ga = ga.GA(seed, cv_trial, method_params);
 
                 base_tmp(cv_trial) = ga.get_default_acc(cv_trial);
                 best_tmp(cv_trial) = ga.get_best_acc(cv_trial);
                 score_tmp(cv_trial) = max(ga.parent_value);
+                
+                csvwrite([current_path '\' datalist{i} '_score_curve' num2str(c_try_num) '.csv'], ga.score_curve);
 
             end
 

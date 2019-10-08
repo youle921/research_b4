@@ -15,6 +15,8 @@ classdef class_randomforest_GA
         population_list
         parent_value
         
+        score_curve
+        
     end
    
     methods
@@ -41,23 +43,26 @@ classdef class_randomforest_GA
                 
                 if strcmp(strategy, 'mutation')
                     obj.update_function = @BitFlip;
+                    obj.params = set_ga_params('p_num', 1);
                 else
-                    obj.update_function = @UXwithBitFlip;
+                    obj.update_function = @UXwithBitFlip;            
+                    obj.params = set_ga_params();
                 end
                 
             elseif strcmp(code, 'real')
                 obj.init_function = @init_real;
                 obj.update_function = @SBXwithPM;
+                obj.params = set_ga_params();
             end
             
         end
 
         function obj = GA(obj, seed, no, method_params)
             
-            obj.params = set_ga_params('p_num', 1,'gen_num', 1000);
-            
             train_data = obj.data(~obj.sep.test(no), :);
             train_ans = obj.ans(~obj.sep.test(no), :);
+            
+            obj.score_curve = zeros(obj.params.gen_num + 1, 1);
             
             score_ans = train_ans;
             
@@ -88,8 +93,11 @@ classdef class_randomforest_GA
             obj.population_list = obj.init_function(obj.params.p_num, obj.params.t_num);
             obj.parent_value = obj.get_score(prd_array, obj.population_list, score_ans);
             
+            obj.score_curve(1) = max(obj.parent_value);
+            
             for i =1 : obj.params.gen_num
                 obj = obj.generate_next_generation(prd_array, score_ans);
+                obj.score_curve(i + 1) = max(obj.parent_value);
             end
             
         end
